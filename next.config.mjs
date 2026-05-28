@@ -6,8 +6,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Remove static export to enable API routes and middleware for authentication
-  // output: 'export', // Disabled - needed for dynamic auth
+  // Static export enabled for Hostinger shared hosting
+  output: 'export',
   trailingSlash: true,
   // distDir: 'dist',
 }

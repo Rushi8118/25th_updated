@@ -115,6 +115,7 @@ export default function StudyVisaPage() {
                   alt="Students studying abroad"
                   fill
                   className="object-cover"
+                  priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
                 <div className="absolute bottom-8 left-8 right-8 p-6 rounded-2xl bg-card/60 border border-white/10 backdrop-blur-md">

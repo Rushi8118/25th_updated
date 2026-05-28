@@ -7,6 +7,7 @@ import { motion } from "framer-motion"
 import { Globe2, ArrowRight, Mail, Lock, Eye, EyeOff, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/use-auth"
+import { getPasswordStrength, registerSchema } from "@/lib/validations/auth"
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState("")
@@ -18,13 +19,18 @@ export default function RegisterPage() {
   const { signUp, signInWithGoogle } = useAuth()
   const router = useRouter()
 
+  const passwordStrength = getPasswordStrength(password)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     setIsLoading(true)
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters")
+    const parsed = registerSchema.safeParse({ fullName, email, password })
+    if (!parsed.success) {
+      // Show the most helpful message first (usually the password requirements).
+      const message = parsed.error.issues.map((i) => i.message).join(" ")
+      setError(message)
       setIsLoading(false)
       return
     }
@@ -144,7 +150,7 @@ export default function RegisterPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min. 6 characters"
+                  placeholder="Min. 8 characters"
                   className="w-full rounded-xl border border-border/60 bg-card/50 py-2.5 pl-10 pr-10 text-sm text-foreground outline-none transition focus:border-primary/60 focus:ring-1 focus:ring-primary/20"
                 />
                 <button
@@ -155,6 +161,38 @@ export default function RegisterPage() {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+
+              {password.length > 0 && (
+                <div className="mt-2 space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-medium text-foreground">
+                      Password strength: {passwordStrength.level}
+                    </span>
+                    <span className="text-muted-foreground">
+                      {passwordStrength.score}/{passwordStrength.maxScore}
+                    </span>
+                  </div>
+
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-border/60">
+                    <div
+                      className="h-full rounded-full bg-primary transition-[width] duration-200"
+                      style={{
+                        width: `${Math.round(
+                          (passwordStrength.score / passwordStrength.maxScore) * 100,
+                        )}%`,
+                      }}
+                    />
+                  </div>
+
+                  {passwordStrength.issues.length > 0 && (
+                    <ul className="space-y-1 text-xs text-red-600">
+                      {passwordStrength.issues.map((msg) => (
+                        <li key={msg}>• {msg}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
             </div>
 
             <Button

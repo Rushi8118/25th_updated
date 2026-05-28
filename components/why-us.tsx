@@ -46,7 +46,7 @@ export function WhyUs() {
                 width={900}
                 height={700}
                 className="h-auto w-full object-cover"
-                priority={false}
+                priority
               />
               <div
                 aria-hidden="true"

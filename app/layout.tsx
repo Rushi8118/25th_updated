@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+import Script from "next/script"
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
@@ -155,6 +156,10 @@ export default function RootLayout({
       className={`${geist.variable} ${geistMono.variable} ${playfair.variable} bg-background`}
       suppressHydrationWarning
     >
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#ece2cf" />
+      </head>
       <body className="font-sans antialiased bg-background text-foreground">
         <script
           type="application/ld+json"
@@ -169,6 +174,17 @@ export default function RootLayout({
           {children}
           <Toaster position="top-center" richColors />
         </ThemeProvider>
+        {process.env.NODE_ENV === "production" && (
+          <Script id="pwa-sw-register" strategy="afterInteractive">
+            {`
+              if ("serviceWorker" in navigator) {
+                window.addEventListener("load", () => {
+                  navigator.serviceWorker.register("/sw.js").catch(() => {});
+                });
+              }
+            `}
+          </Script>
+        )}
         {process.env.NODE_ENV === "production" && <Analytics />}
       </body>
     </html>
